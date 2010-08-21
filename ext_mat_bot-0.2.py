@@ -9,29 +9,31 @@ smw_password = 'botty'
 
 
 # Imports
-from re import sub, match
+
+# Configure the import path
 from sys import path
-from dateutil.parser import parse
-import datetime
 path.append('./mwclient')
 path.append('./mwclient/simplejson')
+
+# Bring in the MW API client
 import client as mwclient
 
-# Bring in me subs
+# Bring in my helper subs
 from subs import GetExtensionTemplate
 from subs import BuildExtensionTemplate
 from subs import ParseExtensionTemplate
+from subs import DateFormat
 
 
 
-# Get a 'site' object and login
+# Get a 'site' object and login to MW
 print 'logging into MW'
 mw_site = mwclient.Site('www.mediawiki.org', path='/w/')
 mw_site.login(mw_username, mw_password)
 
 
 
-# Get a 'site' object and login
+# Get a 'site' object and login to SMW
 print 'logging into SMW'
 smw_site = mwclient.Site('extensions.referata.com', path='/w/')
 smw_site.login(smw_username, smw_password)
@@ -40,10 +42,10 @@ smw_site.login(smw_username, smw_password)
 
 # Get a list of all the pages in the 'all extensions' category
 print 'getting a list of extensions from MW'
-all_extensions = mw_site.categories["All extensions"]
+#all_extensions = mw_site.categories['All extensions']
 
-##Debugging
-#all_extensions = mw_site.categories["Semantic MediaWiki extensions"]
+##Debugging, get a shorter list
+all_extensions = mw_site.categories['Semantic MediaWiki extensions']
 
 ## There must be a way to do this...
 #print 'got a list of %d extensions from MW' % len(all_extensions)
@@ -55,25 +57,22 @@ extensions, extension_dicts = {}, {}
 
 
 
-def DateFormat(mwdate):
-    ## Get the date in 'ISO' format for SMW
-    ## http://semantic-mediawiki.org/wiki/Type:Date
-    return '%04d-%02d-%02dT%02d:%02d:%02d' % (mwdate.tm_year, mwdate.tm_mon, mwdate.tm_mday, mwdate.tm_hour, mwdate.tm_min, mwdate.tm_sec)
-
-
-
 
 
 ###############################################
+
 # Download the template_text for each extension from MW
+
 # Parse it
+
 # Upload it to SMW
+
 ###############################################
 
 print 'doing'
 
 for this_extension in all_extensions:
-    try:
+    #try:
 
         page_name = this_extension.name
 
@@ -97,7 +96,7 @@ for this_extension in all_extensions:
         # extensions
         extensions[extension_name] = ''
 
-        ## Debugging
+        ## Debugging, quit early
         #if(len(extensions) > 3):
         #    break
 
@@ -116,6 +115,7 @@ for this_extension in all_extensions:
             exit('couldnt get template text!')
 
         # Parse the extension text
+        # Most of the work is done here
         print 'parsing template text'
         extension_dict = ParseExtensionTemplate(template_text)
 
@@ -129,7 +129,7 @@ for this_extension in all_extensions:
             DateFormat(list(this_extension.revisions())[-1]['timestamp'])
 
         this_extension_talk = \
-            mw_site.Pages["Extension_talk:" + extension_name]
+            mw_site.Pages['Extension_talk:' + extension_name]
 
         if this_extension_talk.exists:
             extension_dict['talk page last updated'] = \
@@ -138,12 +138,21 @@ for this_extension in all_extensions:
 
 
         # TODO:
+        print ''
+        print ' %s' % extension_name
+        print ' %s' % extension_dict['name']
+        print ''
         extension_dict['name'] = extension_name
 
 #        if 'name' in key:
 #            # Sometimes the name field doesn't contain the actual name
 #            # of the extension
 #            value = extension
+
+        
+        
+        ## Debugging
+        extension_dict['extwikiver'] = '0.2'
 
 
         ## Build the new template
@@ -155,7 +164,7 @@ for this_extension in all_extensions:
         page = smw_site.Pages['Extension:' + extension_name]
         page.save(new_template)
 
-    except:
+    #except:
         # If someone did something stupid, not worth breaking the bot
         print('failed! : ' + extension_name)
         continue
@@ -177,7 +186,7 @@ extension_matrix = ''
 prefix = 'Extension Matrix'
 
 updated = 'Last updated: ' + \
-          datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ' MST. '
+          datetime.datetime.now().strftime('%Y-%m-%d %H:%M') + ' MST. '
 
 num_listed = 'Listing ' + str(len(extension_dicts)) + \
              ' out of ' + str(len(extensions)) + \
