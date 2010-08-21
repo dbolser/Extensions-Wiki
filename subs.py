@@ -1,33 +1,35 @@
 
 # Imports
+import re
+
+# Use these methods directly, without the 're' prefix
 from re import sub, match
+
+
+
+## Functions used in the main loop
 
 # Pull the template from the page text
 def GetExtensionTemplate(page_text):
-    # Normally wouldn't be this simple but the extensions are well
-    # formatted, each ending with \n}}. Could recursively look for sub
-    # templates to be more sure we're at the end.
+    # Normally it wouldn't be this simple, but the extension templates
+    # are usually well formatted, each ending with \n}}.
 
-    template_start = page_text.find('{{Extension')
+    # We could recursively look for sub templates to be more sure
+    # we're at the end.
+    
+    template_start = re.search('^{{Extension', page_text, re.I | re.M)
 
-    if template_start == -1:
-        template_start = page_text.find('{{extension')
+    if template_start:
+        end_pattern = re.compile('^}}', re.M)
+        template_end = end_pattern.search(page_text, template_start.end())
 
-    if template_start == -1:
+        if template_end:
+            return page_text[template_start.start():template_end.end()]
+        else:
+            print 'no end!'
+    else:
         print 'no start!'
-        return 0
-
-    template_end = page_text[template_start:].find('\n}}')
-
-    if template_end == -1:
-        print 'no end!'
-        return 0
-
-    template_end = template_start + template_end
-
-    template_text = page_text[template_start:template_end+3]
-
-    return template_text
+    return 0
 
 
 
@@ -47,6 +49,22 @@ def BuildExtensionTemplate(extension_dict):
     return template
 
 
+
+def DateFormat(mwdate):
+    ## Get the date in 'ISO' format for SMW
+    ## http://semantic-mediawiki.org/wiki/Type:Date
+    return '%04d-%02d-%02dT%02d:%02d:%02d' % (mwdate.tm_year, mwdate.tm_mon, mwdate.tm_mday, mwdate.tm_hour, mwdate.tm_min, mwdate.tm_sec)
+
+
+
+
+
+
+
+
+
+
+## Functions used by the ParseExtensionTemplate Function
 
 # versh
 def GetVersh(version_text):
@@ -69,7 +87,7 @@ def GetVersh(version_text):
 
 
 
-
+# The ParseExtensionTemplate Function
 
 # Parse and cleanup template text
 def ParseExtensionTemplate(template_text):
