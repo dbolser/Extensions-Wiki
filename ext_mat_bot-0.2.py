@@ -42,10 +42,10 @@ smw_site.login(smw_username, smw_password)
 
 # Get a list of all the pages in the 'all extensions' category
 print 'getting a list of extensions from MW'
-#all_extensions = mw_site.categories['All extensions']
+all_extensions = mw_site.categories['All extensions']
 
 ##Debugging, get a shorter list
-all_extensions = mw_site.categories['Semantic MediaWiki extensions']
+#all_extensions = mw_site.categories['Semantic MediaWiki extensions']
 
 ## There must be a way to do this...
 #print 'got a list of %d extensions from MW' % len(all_extensions)
