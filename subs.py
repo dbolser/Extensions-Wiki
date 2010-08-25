@@ -227,7 +227,7 @@ def ParseExtensionTemplate(template_text):
     keys = extension_dict.keys()
     if not len(keys) or len(keys) == 1:
         print('discarding extension (empty)')
-        return 0
+        raise
 
     return( extension_dict )
 

@@ -3,7 +3,7 @@ mw_username = '' # anon is fine
 mw_password = '' # 
 
 # Username and password for the SMW site
-smw_username = ''
+smw_username = 'DMBot'
 smw_password = ''
 
 
@@ -117,8 +117,11 @@ for this_extension in all_extensions:
         # Parse the extension text
         # Most of the work is done here
         print 'parsing template text'
-        extension_dict = ParseExtensionTemplate(template_text)
-
+        try:
+            extension_dict = ParseExtensionTemplate(template_text)
+        except:
+            print "fail!"
+            continue
 
 
         # TODO:
