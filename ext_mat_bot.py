@@ -171,8 +171,8 @@ for this_extension in all_extensions:
             print 'deleting Extension:' + extension_name + '! (Don\'t Panic!)'
             try:
                 old_page.delete(reason = 'Page to be re-created as [[' + extension_name + ']]')
-            except errors.InsufficientPermission, err:
-                print 'failed to delete, insufficient privilages. Never mind'
+            except errors.InsufficientPermission:
+                print 'Failed to delete : insufficient privilages. Never mind'
         
         print 'writing the new page'
         page = smw_site.Pages[extension_name]
