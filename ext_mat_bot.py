@@ -3,8 +3,8 @@ mw_username = '' # anon is fine
 mw_password = '' # 
 
 # Username and password for the SMW site
-smw_username = 'DMBot'
-smw_password = 'botty'
+smw_username = ''
+smw_password = ''
 
 
 
@@ -121,6 +121,22 @@ for this_extension in all_extensions:
 
 
 
+        # TODO:
+
+        # Sometimes the name isn't specified at all
+        if not extension_dict.has_key('name'):
+            print('add a name parameter to ' + extension_name)
+            extension_dict['name'] = extension_name
+
+        print ''
+        print ' %s' % extension_name
+        print ' %s' % extension_dict['name']
+        print ''
+
+        extension_dict['name'] = extension_name
+
+
+
         ## Grab some significant dates
         print 'grabbing some dates'
         extension_dict['page last updated'] = \
@@ -137,22 +153,9 @@ for this_extension in all_extensions:
 
 
 
-        # TODO:
-        print ''
-        print ' %s' % extension_name
-        print ' %s' % extension_dict['name']
-        print ''
-        extension_dict['name'] = extension_name
-
-#        if 'name' in key:
-#            # Sometimes the name field doesn't contain the actual name
-#            # of the extension
-#            value = extension
-
-        
-        
         ## Debugging
         extension_dict['extwikiver'] = '0.2'
+
 
 
         ## Build the new template
@@ -160,14 +163,25 @@ for this_extension in all_extensions:
         new_template = BuildExtensionTemplate(extension_dict)
 
         ## Write the new page
+
+        # Temporary hack...
+        
+        old_page = smw_site.Pages['Extension:' + extension_name]
+        if old_page.exists:
+            print 'deleting Extension:' + extension_name + '! (Don\'t Panic!)'
+            try:
+                old_page.delete(reason = 'Page to be re-created as [[' + extension_name + ']]')
+            except errors.InsufficientPermission, err:
+                print 'failed to delete, insufficient privilages. Never mind'
+        
         print 'writing the new page'
-        page = smw_site.Pages['Extension:' + extension_name]
+        page = smw_site.Pages[extension_name]
         page.save(new_template)
 
     #except:
         # If someone did something stupid, not worth breaking the bot
-        print('failed! : ' + extension_name)
-        continue
+        #print('failed! : ' + extension_name)
+        #continue
 
 
 ## Done!

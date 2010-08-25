@@ -219,13 +219,11 @@ def ParseExtensionTemplate(template_text):
         types = ', '.join(types)
         extension_dict['types'] = types
 
-    # Sometimes the name isn't specified at all
-    if not extension_dict.has_key('name'):
-        print('add a name parameter to ' + extension)
-        extension_dict['name'] = extension
+
 
     # Don't allow empty templates, or templates with just one
     # parameter
+    
     keys = extension_dict.keys()
     if not len(keys) or len(keys) == 1:
         print('discarding (empty) : ' + extension)
